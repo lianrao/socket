@@ -26,8 +26,8 @@ def server(host="", port=12345):
         print("Waiting for clients")
         conn, addr = s.accept()
         print("%s Client connected", addr)
-        work = myThread(conn, session, i)
-        work.start()
+        th = myThread(conn, session, i)
+        th.start()
         print("session count " + str(len(session)))
 
 
@@ -44,33 +44,35 @@ class myThread(threading.Thread):  #
         print("Exiting " + self.name)
 
 
-def login(user, pwd, data, conn, session):
-    if not user:
-        user = data
+def loggedin(cred, data, conn, session):
+    if not cred["user"]:
+        cred["user"] = data
         # check if the same user has already login
-        if session[user]:
-            resp = (user + " has already logged in")
+        if cred["user"] in session:
+            resp = (cred.user + " has already logged in")
             print(resp)
             conn.send(resp)
-        if verify_user(user):
+        if verify_user(cred["user"]):
             conn.send("user".encode("utf-8"))
         return False
-    if not pwd:
-        if verify_pwd(user, data):
-            pwd = data
+    if not cred["pwd"]:
+        if verify_pwd(cred["user"], data):
+            cred["pwd"] = data
+            cred["logged"] = True
             conn.send("login".encode("utf-8"))
-            print(user + " successfully login")
-            session[user] = 1
+            print(cred["user"] + " successfully login")
+            session[cred["user"]] = 1
             return True
         else:
-            user = None  # password incorrect , so need reenter the user name
-            conn.send("Invalid password")
+            cred["user"] = None  # password incorrect , so need reenter the user name
+            conn.send("Invalid password".encode("utf-8"))
             print("Incorrect password")
             return False
 
 
 def work(conn, session):
-    user, pwd = None, None
+
+    creds = {"user":None,"pwd":None,"logged":False}
 
     try:
         print("Got connection from", conn.getpeername())
@@ -78,21 +80,24 @@ def work(conn, session):
             try:
                 buf = conn.recv(1024)
                 msg = buf.decode("utf-8")
-                if not login(user, pwd, conn, session):
+                if not creds["logged"]:
+                    loggedin(creds, msg, conn, session)
                     continue
-                c_msg = Msg(user, msg, session, conn)
+                c_msg = Msg(creds["user"], msg, session, conn)
                 run_cmd(c_msg)
 
             except InvalidOperation:
                 conn.send("Invalid command")
                 continue
             except UserExit:
-                print(user + "exited")
+                print(creds["user"] + "exited")
                 conn.close()
-                del session[user]
+                del session[creds["user"]]
                 break
-    except:
-        pass
+    except :
+        print("Unexpected error:", sys.exc_info()[0])
+        traceback.print_exc()
+
 
 
 def parser_arguments(argv):
@@ -102,7 +107,6 @@ def parser_arguments(argv):
     :return:
     """
     parser = argparse.ArgumentParser()
-    parser.add_argument("operate", type=str, help="r: 运行抢票程序, c: 过滤cdn, t: 测试邮箱和server酱，server酱需要打开开关")
 
     return parser.parse_args(argv)
 

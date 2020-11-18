@@ -24,6 +24,9 @@ class Msg():
         self.session = session
         self.data = mg      #the string that remove the operation string
 
+    def send(self,message):
+        self.conn.send(message.encode("utf-8"))
+
 
 
 
