@@ -67,22 +67,22 @@ def read_thread(msg):
 '''
 command: EDT threadtitle messagenumber message
 '''
-def edit_msg(user, msg):
+def edit_msg(msg):
     pass
 
 
-def upload_file(user, msg):
+def upload_file(msg):
     pass
 
 
-def download_file(user, msg):
+def download_file(msg):
     pass
 
 
 '''
 message:    Thread 9331 removed
 '''
-def remove_thread(user, msg):
+def remove_thread(msg):
     pass
 
 
@@ -90,7 +90,7 @@ def exit_forumn(user):
     pass
 
 
-def shutdown_server(user, msg):
+def shutdown_server(msg):
     pass
 
 
