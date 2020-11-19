@@ -15,7 +15,8 @@ from concurrent.futures import ThreadPoolExecutor
 '''
 init the data diretory
 '''
-
+serverPort = int(sys.argv[2])
+serverAdmin = sys.argv[3]
 
 def init():
     if not os.path.isdir(DATA_DIR):
