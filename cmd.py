@@ -51,21 +51,20 @@ def post_msg(msg):
     if not os.path.exists(DATA_DIR + title):
        res = RespData(RESP_CODE.COMMAND_ERROR,"the thread " + title + " not exsits")
     else:
-        if os.path.exists(DATA_DIR + title):
-            f = open(DATA_DIR + title, 'a')
-            count = len(open(DATA_DIR + title, 'r').readlines())
-            f.write("\n" + str(count) + " " + msg.user + ":" + content)
-            msg.conn.send(msg.user + " message post to %s thread" % title)
-        else:
-            msg.conn.send(msg.user + " threadTitle %s not exists" % title)
+        f = open(DATA_DIR + title, 'a')
+        count = len(open(DATA_DIR + title, 'r').readlines())
+        f.write("\n" + str(count) + " " + msg.user + ":" + content)
+        res = RespData(RESP_CODE.COMMAND_SUCCESS,msg.user + " message post to %s thread" % title)
+    return res
 
 '''
 command: DLT threadtitle messagenumber
 '''
 def del_msg(msg):
     title, sep, num = msg.data.partition(" ")
+    res = None
     if not os.path.exists(DATA_DIR+title):
-        msg.conn.send("error")
+        res = RespData(RESP_CODE.COMMAND_ERROR, "the thread " + title + " not exsits")
     else:
         f = open(DATA_DIR+title, 'a')
         lines = open(DATA_DIR+title, 'r').readlines()
@@ -77,16 +76,26 @@ def del_msg(msg):
             for line in lines:
                 new_file.write(line)
             new_file.close()
-        else: msg.conn.send("no right to delete this message")
+            res = RespData(RESP_CODE.COMMAND_SUCCESS,"Message has been deleted")
+        else:
+            res = RespData(RESP_CODE.COMMAND_ERROR,"The message belongs to another user and cannot be deleted")
+            print("Message cannot be deleted")
+
+    return  res
+
 
 
 def read_thread(msg):
     title = DATA_DIR+msg.data
+    res = None
     if not os.path.exists(title):
-        msg.conn.send("error")
+        res = RespData(RESP_CODE.COMMAND_ERROR, "the thread " + title + " not exsits")
     else:
         with open(title, "r") as file:
-            msg.conn.send(file.read())
+            res = RespData(RESP_CODE.COMMAND_SUCCESS,"\n".join(file.readlines()))
+            print("Thread " + title +" read")
+
+    return res
 
 
 '''
@@ -94,8 +103,9 @@ command: EDT threadtitle messagenumber message
 '''
 def edit_msg(msg):
     title, sep1, num, sep2, message = msg.data.partition(" ")
+    res = None
     if not os.path.exists(DATA_DIR + title):
-        msg.conn.send("error")
+        res = RespData(RESP_CODE.COMMAND_ERROR, "the thread " + title + " not exsits")
     else:
         f = open(DATA_DIR + title, 'a')
         lines = open(DATA_DIR + title, 'r').readlines()
@@ -107,8 +117,13 @@ def edit_msg(msg):
             for line in lines:
                 new_file.write(line)
             new_file.close()
+            res = RespData(RESP_CODE.COMMAND_SUCCESS,"The message has been edited")
+            print("Message has been edited")
         else:
-            msg.conn.send("no right to edit this message")
+            res = RespData(RESP_CODE.COMMAND_ERROR,"The message belongs to another user and cannot be edited")
+            print("Message cannot be edited")
+
+    return res
 
 
 def upload_file(msg):
@@ -135,15 +150,21 @@ message:    Thread 9331 removed
 '''
 def remove_thread(msg):
     title = DATA_DIR+ msg.data
+    res = None
     if not os.path.exists(DATA_DIR + title):
-        msg.conn.send("error")
+        res = RespData(RESP_CODE.COMMAND_ERROR, "the thread " + title + " not exsits")
     else:
         with open(title,"r") as file:
             user = file.readline
         if user == msg.user:
             os.remove(title)
+            res = RespData(RESP_CODE.COMMAND_SUCCESS,"The thread has been removed")
+            print("Thread "+ title +" removed")
         else:
-            msg.conn.send("no right to remove")
+            res = RespData(RESP_CODE.COMMAND_ERROR,"The thread was created by another user and cannot be removed")
+            print("Thread " + title +" cannot be removed")
+
+    return res
 
 
 
@@ -152,8 +173,8 @@ command:  XIT
 '''
 def exit_forumn(msg):
     res = RespData(RESP_CODE.COMMAND_SUCCESS,"Goodbye")
-    msg.send(res.serialize())
     print(msg.user + " exited")
+    return res
 
 '''
 command:    SHT admin_password
@@ -177,28 +198,28 @@ def run_cmd(msg):
     op = msg.op
     res = None
     if op not in CMD_SET:
-
-        return CmdRspCode.CONTINUE
+        res = RespData(RESP_CODE.COMMAND_ERROR," Invalid command")
+        return res
     #run the correct command
     print(msg.user + " issued " + msg.op + " command")
     if op == "CRT":
-        create_thread(msg)
+       return create_thread(msg)
     if op == "LST":
-        list_threads(msg)
+        return list_threads(msg)
     if op == "MSG":
-        post_msg(msg)
+        return post_msg(msg)
     if op == "DLT":
-        del_msg(msg)
+        return  del_msg(msg)
     if op == "RDT":
-        read_thread(msg)
+        return read_thread(msg)
     if op == "EDT":
-        edit_msg(msg)
+        return edit_msg(msg)
     if op == "UPD":
-        upload_file(msg)
+        return upload_file(msg)
     if op == "DWN":
-        download_file(msg)
+        return download_file(msg)
     if op == "RMV":
-        remove_thread(msg)
+        return  remove_thread(msg)
     if op == "XIT":
         return  exit_forumn(msg)
     if op == "SHT":
