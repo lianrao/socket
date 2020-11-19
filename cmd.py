@@ -3,17 +3,15 @@ from sys import path
 import exceptions
 from common import *
 import os
+import shutil
 
 CMD_SET = {"CRT", "LST", "MSG", "DLT", "RDT", "EDT", "UPD", "DWN", "RMV", "XIT", "SHT"}
-
-THREAD_DIR = "data/"
-
 
 '''
 command:    CRT 3331
 '''
 def create_thread(msg):
-    title = THREAD_DIR + msg.data
+    title = DATA_DIR + msg.data
     if os.path.isfile(title):
         msg.send("the thread " + title + " is already exists")
     else:
@@ -29,7 +27,7 @@ The list of active threads:
 9331
 '''
 def list_threads(msg):
-    arr = os.listdir(THREAD_DIR)
+    arr = os.listdir(DATA_DIR)
     if len(arr) == 0:
         msg.send("No threads to list ")
     else:
@@ -44,21 +42,22 @@ message:    Message posted to 3331 thread
 '''
 def post_msg(msg):
     title, sep, content = msg.data.partition(" ")
-    if not os.path.exists(THREAD_DIR+title):
-        msg.send("The thread " + title + " does't exist")
-    with open(THREAD_DIR + title,"a+") as f:
-        lines = f.readlines()
-        msg_num = len(lines)
-        line = str(msg_num) + " " + msg.user + ": " + content
-        f.writelines([line])
-    msg.send("Message posted to " + title + " thread")
-
+    if not os.path.exists(DATA_DIR + title):
+        msg.conn.send("error")
+    else:
+        if os.path.exists(DATA_DIR + title):
+            f = open(DATA_DIR + title, 'a')
+            count = len(open(DATA_DIR + title, 'r').readlines())
+            f.write("\n" + str(count) + " " + msg.user + ":" + content)
+            msg.conn.send(msg.user + " message post to %s thread" % title)
+        else:
+            msg.conn.send(msg.user + " threadTitle %s not exists" % title)
 
 '''
 command: DLT threadtitle messagenumber
 '''
-def del_msg(msg):
-    pass
+def del_msg(user, msg):
+    title, sep, content = msg.data.partition(" ")
 
 
 def read_thread(msg):
@@ -89,9 +88,17 @@ def remove_thread(msg):
 def exit_forumn(user):
     pass
 
-
+'''
+command:    SHT admin_password
+'''
 def shutdown_server(msg):
-    pass
+    admin_pwd = msg.data
+    if not admin_pwd == "destroy":
+        msg.send("error")
+        return
+    shutil.rmtree(DATA_DIR, ignore_errors=True)
+    msg.send("Server shutting down")
+    sys.exit(0)
 
 
 def run_cmd(msg):
@@ -99,6 +106,8 @@ def run_cmd(msg):
     if op not in CMD_SET:
         msg.send("invalid commmand")
         return CmdRspCode.CONTINUE
+    #run the correct command
+    print(msg.user + " issued " + msg.op + " command")
     if op == "CRT":
         create_thread(msg)
     if op == "LST":
@@ -124,5 +133,4 @@ def run_cmd(msg):
         shutdown_server(msg)
         return CmdRspCode.SHUTDOWN
 
-    print(msg.user + " issued " + msg.op + " command")
     return CmdRspCode.CONTINUE

@@ -8,9 +8,20 @@ from common import *
 import threading
 from exceptions import *
 from cmd import run_cmd
+import os.path
+
+'''
+init the data diretory
+'''
+
+
+def init():
+    if not os.path.isdir(DATA_DIR):
+        os.mkdir(DATA_DIR)
 
 
 def server(host="", port=12345):
+    init()
     address = (host, port)
     time_now = time.strftime("%Y-%m-%d %H:%S:%M", time.localtime())
 
@@ -18,7 +29,7 @@ def server(host="", port=12345):
     s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
     s.bind(address)
     s.listen(1)
-    session = dict()
+    session = set()
 
     i = 0
     while True:
@@ -44,57 +55,55 @@ class myThread(threading.Thread):  #
         print("Exiting " + self.name)
 
 
-def loggedin(cred, data, conn, session):
-    if not cred["user"]:
-        cred["user"] = data
-        # check if the same user has already login
-        if cred["user"] in session:
-            resp = (cred.user + " has already logged in")
-            print(resp)
-            conn.send(resp)
-        if verify_user(cred["user"]):
-            conn.send("user".encode("utf-8"))
-        return False
-    if not cred["pwd"]:
-        if verify_pwd(cred["user"], data):
-            cred["pwd"] = data
-            cred["logged"] = True
-            conn.send("login".encode("utf-8"))
-            print(cred["user"] + " successfully login")
-            session[cred["user"]] = 1
-            return True
-        else:
-            cred["user"] = None  # password incorrect , so need reenter the user name
-            conn.send("Invalid password".encode("utf-8"))
-            print("Incorrect password")
-            return False
-
 
 def work(conn, session):
-    creds = {"user": None, "pwd": None, "logged": False}
+    username = None
+    loggedin = False
 
     try:
         print("Got connection from", conn.getpeername())
         while True:
             buf = conn.recv(1024)
-            msg = buf.decode("utf-8")
-            if not creds["logged"]:
-                loggedin(creds, msg, conn, session)
-                continue
-            c_msg = Msg(creds["user"], msg, session, conn)
-            rtn = run_cmd(c_msg)
-            if rtn == CmdRspCode.EXIT:
-                break
-            if rtn == CmdRspCode.SHUTDOWN:
-                #TODO
-                break
+            req = ReqData.unserialize(buf)
+
+            res = None
+            #input username
+            if req.code == REQ_CODE.USERNAME_INPUT:
+                res = verify_user(req,session)
+                #if the username is correct , then store it
+                if res.code == RESP_CODE.USERNAME_IS_CORRECT:
+                    username = req.data
+            #input password
+            elif req.code == REQ_CODE.PASSWORD_INPUT:
+                if username :
+                   res = RespData(RESP_CODE.USERNAME_NOT_INPUT,"please input your username first")
+                else :
+                   pwd = req.data
+                   res = verify_pwd(username,pwd)
+                   if res.code == RESP_CODE.PWD_IS_CORRECT:
+                        #if logged in , then add the user to session
+                        session.add(username)
+                        loggedin = True
+            #create a new user with input password
+            elif req.code == REQ_CODE.USER_CREATE :
+                res = add_user(username,req.data)
+            else:
+                #command process
+                if not loggedin :
+                    res = RespData(RESP_CODE.NOT_LOGGED_IN,"please logging in first")
+                else:
+                    c_msg = Msg(username , req.data , session, conn)
+                    rtn = run_cmd(c_msg)
+                    if rtn == CmdRspCode.EXIT:
+                        break
+            conn.send(res.serialize())
     except:
         print("Unexpected error:", sys.exc_info()[0])
         traceback.print_exc()
     finally:
-        print(creds["user"] + "exited")
+        print(str(username) + "exited")
         conn.close()
-        del session[creds["user"]]
+        session.remove(str(username))
 
 
 def parser_arguments(argv):
