@@ -18,13 +18,16 @@ KILL_SREVER = "__kill_server__"
 class RESP_CODE(Enum):
     USER_ALREADY_LOGGED = auto()
     LOGGED_IN = auto()
+    NOT_LOGGED_IN = auto()
     SUCCESS = auto()
+
     USERNAME_IS_CORRECT = auto()
     USERNAME_IS_WRONG = auto()
     USERNAME_NOT_INPUT = auto()
+
     PWD_IS_CORRECT = auto()
     PWD_IS_WRONG = auto()
-    NOT_LOGGED_IN = auto()
+
 
     COMMAND_SUCCESS = auto()
     COMMAND_ERROR = auto()
@@ -77,7 +80,7 @@ class ReqData:
     def unserialize(cls, raw_data):
         d = raw_data.decode("utf-8")
         #remove newline char
-        d.replace('\n','').replace('\r','')
+        d = d.replace('\n','').replace('\r','')
         code, sep, content = d.partition(DATA_SEP)
         op, sep, data = content.partition(DATA_SEP)
         #remove left and right space
@@ -137,7 +140,7 @@ def verify_pwd(username, pwd):
             if username == arr[0] and pwd == arr[1]:
                 res = RespData(RESP_CODE.PWD_IS_CORRECT, username + " is logged in")
                 break
-    if res:
+    if not res:
         res = RespData(RESP_CODE.PWD_IS_WRONG,"Invalid password")
     return  res
 

@@ -167,7 +167,7 @@ def shutdown_server(msg):
     return res
 
 
-def run_cmd(msg,session):
+def run_cmd(msg):
     op = msg.op
     res = None
     if op not in CMD_SET:
@@ -186,7 +186,7 @@ def run_cmd(msg,session):
     if op == "RDT":
         read_thread(msg)
     if op == "EDT":
-        edit_msg(msg,session)
+        edit_msg(msg)
     if op == "UPD":
         upload_file(msg)
     if op == "DWN":
@@ -194,9 +194,7 @@ def run_cmd(msg,session):
     if op == "RMV":
         remove_thread(msg)
     if op == "XIT":
-        exit_forumn(msg)
-        return CmdRspCode.EXIT
+        return  exit_forumn(msg)
     if op == "SHT":
-        shutdown_server(msg)
-        return CmdRspCode.EXIT
+        return shutdown_server(msg)
 
