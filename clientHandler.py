@@ -1,4 +1,5 @@
 import re
+import sys
 #enter username
 def enterUsername():
     username = input("Enter username: ")
@@ -21,6 +22,20 @@ def checkMessageNull(msg):
     if message == "":
         print("message cannot be null")
         enterCommand()
+def receiveFile(cmd):
+    with open('received_file', 'wb') as f:
+        print
+        'file opened'
+        while True:
+            print('receiving data...')
+            data = s.recv(1024)
+            print('data=%s', (data))
+            if not data:
+                break
+            # write data to a file
+            f.write(data)
+
+    f.close()
 
 def identifyCommand(cmd):
     flag = cmd[0,3]
@@ -67,21 +82,24 @@ def identifyCommand(cmd):
     #DWN: Download file
     #DWN threadtitle filename
     elif flag == "DWN":
-        pass
+        checkThreadTitle(cmd)
+        receiveFile()
+        return cmd
     #RMV: Remove Thread
     #RMV threadtitle
     elif flag == "RMV":
-        pass
+        checkThreadTitle(cmd)
+        return cmd
     #XIT: Exit
     #XIT
     elif flag == "XIT":
-        pass
+        sys.exit()
     #SHT: Shutdown
     #SHT admin_password
     elif flag == "SHT":
         pass
     else:
-        print("Wrong command")
+        print("Wrong")
         enterCommand()
     return cmd
 
@@ -97,9 +115,3 @@ def enterCommand():
     else:
         identifyCommand(command)
 
-
-def main():
-    pass
-
-if __name__ == "__main__":
-    main()

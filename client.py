@@ -8,7 +8,7 @@ python3
 import socket
 import sys
 
-import clientHandler as ch
+from clientHandler import enterCommand
 serverAddr = "127.0.0.1"
 serverPort = 12345
 
@@ -25,12 +25,13 @@ def main():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((serverAddr, serverPort))
         username = input("Enter username: ")
-        s.send(("un/"+username).encode())
+        password = input("Enter password: ")
+        s.send(username+" "+password)
         while True:
-            msg = s.recv(1024).decode('utf-8')
-            #msg = cs.main(msg)
-            #print(msg)
-            s.send(msg.encode('utf-8'))
+            msg = s.recv(1024)
+
+            msg = enterCommand(msg)
+            s.send(msg)
 
 
 
