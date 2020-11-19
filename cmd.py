@@ -36,14 +36,21 @@ filedata:   messagenumber username: message
 def post_msg(msg):
     title, sep, content = msg.data.partition(" ")
     if not os.path.exists(THREAD_DIR+title):
-        msg.conn.send("")
-
+        msg.conn.send("error")
+    else:
+        if os.path.exists(THREAD_DIR+title):
+            f = open(THREAD_DIR+title, 'a')
+            count = len(open(THREAD_DIR+title, 'r').readlines())
+            f.write("\n" + str(count) + " " + msg.user + ":" + content)
+            msg.conn.send(msg.user + " message post to %s thread" % title)
+        else:
+            msg.conn.send(msg.user + " threadTitle %s not exists" % title)
 
 '''
 command: DLT threadtitle messagenumber
 '''
 def del_msg(user, msg):
-    pass
+    title, sep, content = msg.data.partition(" ")
 
 
 def read_thread(user, msg):
