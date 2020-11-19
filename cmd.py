@@ -141,26 +141,37 @@ def remove_thread(msg):
 
 
 
-def exit_forumn(user):
-    pass
+'''
+command:  XIT
+'''
+def exit_forumn(msg):
+    res = RespData(RESP_CODE.COMMAND_SUCCESS,"Goodbye")
+    msg.send(res.serialize())
+    print(msg.user + " exited")
 
 '''
 command:    SHT admin_password
 '''
 def shutdown_server(msg):
     admin_pwd = msg.data
-    if not admin_pwd == "destroy":
-        msg.send("error")
-        return
-    shutil.rmtree(DATA_DIR, ignore_errors=True)
-    msg.send("Server shutting down")
-    sys.exit(0)
+    res = None
+    if admin_pwd != "destroy":
+        res = RespData(RESP_CODE.COMMAND_ERROR,"Incorrect password")
+        print("Incorrect password")
+        msg.send(res.serialize())
+    else:
+        shutil.rmtree(DATA_DIR, ignore_errors=True)
+        res = RespData(RESP_CODE.SERVER_SHUTDOWN , "Goodbye. Server shutting down")
+        print("Server shutting down")
+        msg.session.add(KILL_SREVER)
+    return res
 
 
 def run_cmd(msg,session):
     op = msg.op
+    res = None
     if op not in CMD_SET:
-        msg.send("invalid commmand")
+
         return CmdRspCode.CONTINUE
     #run the correct command
     print(msg.user + " issued " + msg.op + " command")
@@ -187,6 +198,5 @@ def run_cmd(msg,session):
         return CmdRspCode.EXIT
     if op == "SHT":
         shutdown_server(msg)
-        return CmdRspCode.SHUTDOWN
+        return CmdRspCode.EXIT
 
-    return CmdRspCode.CONTINUE

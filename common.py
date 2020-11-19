@@ -13,6 +13,7 @@ DATA_DIR = "data/"
 # data seperator
 DATA_SEP = ": "
 
+KILL_SREVER = "__kill_server__"
 
 class RESP_CODE(Enum):
     USER_ALREADY_LOGGED = auto()
@@ -24,6 +25,13 @@ class RESP_CODE(Enum):
     PWD_IS_CORRECT = auto()
     PWD_IS_WRONG = auto()
     NOT_LOGGED_IN = auto()
+
+    COMMAND_SUCCESS = auto()
+    COMMAND_ERROR = auto()
+
+    USER_EXIT = auto()
+
+    SERVER_SHUTDOWN = auto()
 
 
 class REQ_CODE(Enum):
@@ -93,7 +101,7 @@ class Msg():
         self.req = req
 
     def send(self, message):
-        self.conn.send(message.encode("utf-8"))
+        self.conn.send(message)
 
 
 def verify_user(req, session):

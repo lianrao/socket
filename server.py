@@ -9,6 +9,7 @@ import threading
 from exceptions import *
 from cmd import run_cmd
 import os.path
+from concurrent.futures import ThreadPoolExecutor
 
 '''
 init the data diretory
@@ -31,79 +32,104 @@ def server(host="", port=12345):
     s.listen(1)
     session = set()
 
-    i = 0
-    while True:
-        i += 1
-        print("Waiting for clients")
-        conn, addr = s.accept()
-        print("%s Client connected", addr)
-        th = myThread(conn, session, i)
-        th.start()
-        print("session count " + str(len(session)))
+    print("Server started , Waiting for clients")
+    th = AcceptThread(s,session)
+    th.start()
+    th.join()
 
 
-class myThread(threading.Thread):  #
-    def __init__(self, conn, session, counter):
+class AcceptThread(threading.Thread):
+    def __init__(self, socket,session):
+        threading.Thread.__init__(self)
+        self.socket = socket
+        self.session = session
+        self.server_down = False
+
+    def run(self):
+        ths = []
+        while True:
+            conn, addr = self.socket.accept()
+            th = WorkThread(conn, self.session)
+            th.start()
+            ths.append(th)
+
+    def shutdown(self):
+        self.server_down = True
+
+    def is_shutdown(self):
+        return self.server_down
+
+class WorkThread(threading.Thread):  #
+    def __init__(self, conn, session):
         threading.Thread.__init__(self)
         self.conn = conn
-        self.counter = counter
         self.session = session
+        self.server_down = False
 
     def run(self):  # 把要执行的代码写到run函数里面 线程在创建后会直接运行run函数
         print("Starting " + self.name)
-        work(self.conn, self.session)
+        self.work()
         print("Exiting " + self.name)
 
+    def shutdown(self):
+        self.server_down = True
+
+    def is_shutdown(self):
+        return self.server_down
 
 
-def work(conn, session):
-    username = None
-    loggedin = False
+    def work(self):
+        username = None
+        loggedin = False
+        conn =self.conn
+        session = self.session
+        try:
+            print("Got connection from", conn.getpeername())
+            while not self.is_shutdown():
+                buf = conn.recv(1024)
+                req = ReqData.unserialize(buf)
 
-    try:
-        print("Got connection from", conn.getpeername())
-        while True:
-            buf = conn.recv(1024)
-            req = ReqData.unserialize(buf)
-
-            res = None
-            #input username
-            if req.code == REQ_CODE.USERNAME_INPUT:
-                res = verify_user(req,session)
-                #if the username is correct , then store it
-                if res.code == RESP_CODE.USERNAME_IS_CORRECT:
-                    username = req.data
-            #input password
-            elif req.code == REQ_CODE.PASSWORD_INPUT:
-                if username :
-                   res = RespData(RESP_CODE.USERNAME_NOT_INPUT,"please input your username first")
-                else :
-                   pwd = req.data
-                   res = verify_pwd(username,pwd)
-                   if res.code == RESP_CODE.PWD_IS_CORRECT:
-                        #if logged in , then add the user to session
-                        session.add(username)
-                        loggedin = True
-            #create a new user with input password
-            elif req.code == REQ_CODE.USER_CREATE :
-                res = add_user(username,req.data)
-            else:
-                #command process
-                if not loggedin :
-                    res = RespData(RESP_CODE.NOT_LOGGED_IN,"please logging in first")
+                res = None
+                #input username
+                if req.code == REQ_CODE.USERNAME_INPUT:
+                    res = verify_user(req,session)
+                    #if the username is correct , then store it
+                    if res.code == RESP_CODE.USERNAME_IS_CORRECT:
+                        username = req.data
+                #input password
+                elif req.code == REQ_CODE.PASSWORD_INPUT:
+                    if username :
+                       res = RespData(RESP_CODE.USERNAME_NOT_INPUT,"please input your username first")
+                    else :
+                       pwd = req.data
+                       res = verify_pwd(username,pwd)
+                       if res.code == RESP_CODE.PWD_IS_CORRECT:
+                            #if logged in , then add the user to session
+                            session.add(username)
+                            loggedin = True
+                #create a new user with input password
+                elif req.code == REQ_CODE.USER_CREATE :
+                    res = add_user(username,req.data)
                 else:
-                    c_msg = Msg(username , req.data , session, conn)
-                    rtn = run_cmd(c_msg)
-                    if rtn == CmdRspCode.EXIT:
-                        break
-            conn.send(res.serialize())
-    except:
-        print("Unexpected error:", sys.exc_info()[0])
-        traceback.print_exc()
-    finally:
-        print(str(username) + "exited")
-        conn.close()
-        session.remove(str(username))
+                    #command process
+                    if not loggedin :
+                        res = RespData(RESP_CODE.NOT_LOGGED_IN,"please logging in first")
+                    else:
+                        c_msg = Msg(username , req, session, conn)
+                        res = run_cmd(c_msg)
+                conn.send(res.serialize())
+                if res.code == RESP_CODE.USER_EXIT or res.code == RESP_CODE.SERVER_SHUTDOWN :
+                    break
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
+            traceback.print_exc()
+        finally:
+            if self.server_down :
+                print("Server shutting down")
+                res = RespData(RESP_CODE.SERVER_SHUTDOWN,"Goodbye. Server shutting down")
+                self.conn.send(res.serialize())
+            conn.close()
+            session.remove(str(username))
 
 
 def parser_arguments(argv):
