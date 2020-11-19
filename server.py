@@ -85,18 +85,16 @@ def work(conn, session):
                     continue
                 c_msg = Msg(creds["user"], msg, session, conn)
                 run_cmd(c_msg)
-
-            except InvalidOperation:
-                conn.send("Invalid command")
-                continue
             except UserExit:
-                print(creds["user"] + "exited")
-                conn.close()
-                del session[creds["user"]]
                 break
     except :
         print("Unexpected error:", sys.exc_info()[0])
         traceback.print_exc()
+    finally:
+        print(creds["user"] + "exited")
+        conn.close()
+        del session[creds["user"]]
+
 
 
 

@@ -96,9 +96,9 @@ def shutdown_server(msg):
 
 def run_cmd(msg):
     op = msg.op
-    print(msg.user + " issued " + msg.op + " command")
     if op not in CMD_SET:
-        raise exceptions.InvalidOperation("invalid operation!")
+        msg.send("invalid commmand")
+        return
     if op == "CRT":
         create_thread(msg)
     if op == "LST":
@@ -121,3 +121,5 @@ def run_cmd(msg):
         exit_forumn(msg)
     if op == "SHT":
         shutdown_server(msg)
+
+    print(msg.user + " issued " + msg.op + " command")
