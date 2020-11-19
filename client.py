@@ -1,44 +1,40 @@
-# -*- coding=utf-8 -*-
-import argparse
-import sys
+
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Nov 16 02:46:16 2020
+
+@author: jiyut
+python3
+"""
 import socket
-import traceback
-import time
+import sys
 from common import *
-import threading
-from exceptions import *
-from cmd import run_cmd
+
+from clientHandler import enterCommand
+serverAddr = "127.0.0.1"
+serverPort = 12345
+
+#serverAddr = str(sys.argv[2])
+#serverPort = int(sys.argv[3])
+#import clientService as cs
+
+def main():
+    print(">python Client %s %d"% (serverAddr, serverPort))
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.connect((serverAddr, serverPort))
+        username = input("Enter username: ")
+        req = ReqData(REQ_CODE.USERNAME_INPUT,REQ_CODE.USERNAME_INPUT,username)
+        s.send(req.serialize())
+        password = input("Enter password: ")
+        req = ReqData(REQ_CODE.PASSWORD_INPUT,REQ_CODE.PASSWORD_INPUT,password)
+        s.send(req.serialize())
+        while True:
+            msg = s.recv(1024)
+
+            msg = enterCommand(msg)
+            s.send(msg)
 
 
-def client(host="localhost", port=12345):
-    # 创建套接字
-    tcpClientSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print('socket---%s' % tcpClientSocket)
-    # 链接服务器
-    serverAddr = (host,port)
-    tcpClientSocket.connect(serverAddr)
-    print('connect success!')
 
-    while True:
-        # 发送数据
-        sendData = input('please input data:')
-
-        if len(sendData) > 0:
-            tcpClientSocket.send(sendData.encode("utf-8"))
-
-        else:
-            break
-
-            # 接收数据
-        recvData = tcpClientSocket.recv(1024)
-        # 打印接收到的数据
-        print('the receive message is:%s' % recvData)
-
-    # 关闭套接字
-    tcpClientSocket.close()
-    print('close socket!')
-
-
-if __name__ == '__main__':
-    # args = parser_arguments(sys.argv[1:])
-    client()
+if __name__ == "__main__":
+    main()
