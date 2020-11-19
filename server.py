@@ -71,31 +71,30 @@ def loggedin(cred, data, conn, session):
 
 
 def work(conn, session):
-
-    creds = {"user":None,"pwd":None,"logged":False}
+    creds = {"user": None, "pwd": None, "logged": False}
 
     try:
         print("Got connection from", conn.getpeername())
         while True:
-            try:
-                buf = conn.recv(1024)
-                msg = buf.decode("utf-8")
-                if not creds["logged"]:
-                    loggedin(creds, msg, conn, session)
-                    continue
-                c_msg = Msg(creds["user"], msg, session, conn)
-                run_cmd(c_msg)
-            except UserExit:
+            buf = conn.recv(1024)
+            msg = buf.decode("utf-8")
+            if not creds["logged"]:
+                loggedin(creds, msg, conn, session)
+                continue
+            c_msg = Msg(creds["user"], msg, session, conn)
+            rtn = run_cmd(c_msg)
+            if rtn == CmdRspCode.EXIT:
                 break
-    except :
+            if rtn == CmdRspCode.SHUTDOWN:
+                #TODO
+                break
+    except:
         print("Unexpected error:", sys.exc_info()[0])
         traceback.print_exc()
     finally:
         print(creds["user"] + "exited")
         conn.close()
         del session[creds["user"]]
-
-
 
 
 def parser_arguments(argv):

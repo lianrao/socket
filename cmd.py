@@ -98,7 +98,7 @@ def run_cmd(msg):
     op = msg.op
     if op not in CMD_SET:
         msg.send("invalid commmand")
-        return
+        return CmdRspCode.CONTINUE
     if op == "CRT":
         create_thread(msg)
     if op == "LST":
@@ -119,7 +119,10 @@ def run_cmd(msg):
         remove_thread(msg)
     if op == "XIT":
         exit_forumn(msg)
+        return CmdRspCode.EXIT
     if op == "SHT":
         shutdown_server(msg)
+        return CmdRspCode.SHUTDOWN
 
     print(msg.user + " issued " + msg.op + " command")
+    return CmdRspCode.CONTINUE

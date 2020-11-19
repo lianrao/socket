@@ -14,6 +14,11 @@ class RespCode(Enum):
     LOGGED_IN = 2
     SUCCESS = 3
 
+class CmdRspCode(Enum):
+    CONTINUE = 1  #client continue run
+    EXIT = 2       #client exit
+    SHUTDOWN = 3    # server shutdown
+
 class Msg():
     def __init__(self, user, msg, session, conn):
         self.user = user
