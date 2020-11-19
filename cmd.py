@@ -49,20 +49,19 @@ def post_msg(msg):
 '''
 command: DLT threadtitle messagenumber
 '''
-def del_msg(user, msg):
+def del_msg(msg):
     title, sep, num = msg.data.partition(" ")
     if not os.path.exists(THREAD_DIR+title):
         msg.conn.send("error")
     else:
-        if os.path.exists(THREAD_DIR+title):
-            f = open(THREAD_DIR+title, 'a')
-            lines = open(THREAD_DIR+title, 'r').readlines()
-            del(lines[num])
-            f.close()
-            new_file = open(THREAD_DIR+title, "w+")
-            for line in lines:
-                new_file.write(line)
-            new_file.close()
+        f = open(THREAD_DIR+title, 'a')
+        lines = open(THREAD_DIR+title, 'r').readlines()
+        del(lines[num])
+        f.close()
+        new_file = open(THREAD_DIR+title, "w+")
+        for line in lines:
+            new_file.write(line)
+        new_file.close()
 
 
 def read_thread(user, msg):
