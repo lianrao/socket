@@ -12,13 +12,15 @@ command:    CRT 3331
 '''
 def create_thread(msg):
     title = DATA_DIR + msg.data
+    res = None
     if os.path.isfile(title):
-        msg.send("the thread " + title + " is already exists")
+        res = RespData(RESP_CODE.COMMAND_ERROR,"Thread " + title + " exists")
     else:
         with open(title, "w") as file:
             file.writelines([msg.user])
-        print(msg.user + "create thread " + title + " success")
-        msg.send("create thread " + title + " success")
+        print("Thread "+ title + " created")
+        res = RespData(RESP_CODE.COMMAND_SUCCESS,"Thread "+ title + " created")
+    return res
 
 '''
 res_msg:    
@@ -28,11 +30,13 @@ The list of active threads:
 '''
 def list_threads(msg):
     arr = os.listdir(DATA_DIR)
+    res = None
     if len(arr) == 0:
-        msg.send("No threads to list ")
+        res = RespData(RESP_CODE.COMMAND_SUCCESS,"No threads to list")
     else:
         data = "\n".join(["The list of active threads"] + arr)
-        msg.send(data)
+        res = RespData(RESP_CODE.COMMAND_SUCCESS,data)
+    return res
 
 
 '''
@@ -42,8 +46,10 @@ message:    Message posted to 3331 thread
 '''
 def post_msg(msg):
     title, sep, content = msg.data.partition(" ")
+
+    res = None
     if not os.path.exists(DATA_DIR + title):
-        msg.conn.send("error")
+       res = RespData(RESP_CODE.COMMAND_ERROR,"the thread " + title + " not exsits")
     else:
         if os.path.exists(DATA_DIR + title):
             f = open(DATA_DIR + title, 'a')
