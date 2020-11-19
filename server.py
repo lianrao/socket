@@ -9,6 +9,7 @@ import threading
 from exceptions import *
 from cmd import run_cmd
 import os.path
+import sys
 from concurrent.futures import ThreadPoolExecutor
 
 '''
@@ -36,7 +37,12 @@ def server(host="", port=12345):
     print("Server started , Waiting for clients")
     th = AcceptThread(s,session)
     th.start()
-    th.join()
+    while True:
+        if KILL_SREVER in session:
+            break
+        time.sleep(1)
+    print("server has shutting down")
+
 
 
 class AcceptThread(threading.Thread):
@@ -99,7 +105,7 @@ class WorkThread(threading.Thread):  #
                         username = req.data
                 #input password
                 elif req.code == REQ_CODE.PASSWORD_INPUT:
-                    if username :
+                    if not username :
                        res = RespData(RESP_CODE.USERNAME_NOT_INPUT,"please input your username first")
                     else :
                        pwd = req.data
