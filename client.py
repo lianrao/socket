@@ -11,12 +11,13 @@ import sys
 from common import *
 
 from clientHandler import enterCommand
-serverAddr = "127.0.0.1"
-serverPort = 12345
+#serverAddr = "127.0.0.1"
+#serverPort = 12345
 
-#serverAddr = str(sys.argv[2])
-#serverPort = int(sys.argv[3])
+serverAddr = str(sys.argv[2])
+serverPort = int(sys.argv[3])
 #import clientService as cs
+
 
 def main():
     print(">python Client %s %d"% (serverAddr, serverPort))
@@ -30,9 +31,14 @@ def main():
         s.send(req.serialize())
         while True:
             msg = s.recv(1024)
+            enterCommand(s)
+            resp = RespData.unserialize(msg)
+            if resp.data[0] == 1:
+                with open(resp.data[1:resp.data.find(" ")], 'wb') as f:
+                    f.write(resp.data[resp.data.find(" ") + 1:])
+            else:
+                print(resp.data)
 
-            msg = enterCommand(msg)
-            s.send(msg)
 
 
 
