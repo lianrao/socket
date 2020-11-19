@@ -58,16 +58,16 @@ command: DLT threadtitle messagenumber
 '''
 def del_msg(msg):
     title, sep, num = msg.data.partition(" ")
-    if not os.path.exists(THREAD_DIR+title):
+    if not os.path.exists(DATA_DIR+title):
         msg.conn.send("error")
     else:
-        f = open(THREAD_DIR+title, 'a')
-        lines = open(THREAD_DIR+title, 'r').readlines()
+        f = open(DATA_DIR+title, 'a')
+        lines = open(DATA_DIR+title, 'r').readlines()
         target_line = lines[num]
         if target_line[target_line.find(" ")+1,target_line.find(":")] == msg.user:
             del(lines[num])
             f.close()
-            new_file = open(THREAD_DIR+title, "w+")
+            new_file = open(DATA_DIR+title, "w+")
             for line in lines:
                 new_file.write(line)
             new_file.close()
@@ -75,50 +75,39 @@ def del_msg(msg):
 
 
 def read_thread(msg):
-    title = THREAD_DIR+msg.data
+    title = DATA_DIR+msg.data
     if not os.path.exists(title):
         msg.conn.send("error")
     else:
         with open(title, "r") as file:
             msg.conn.send(file.read())
 
-<<<<<<< HEAD
-def read_thread(msg):
-    pass
-=======
->>>>>>> 3b8bc21166188bd643a792d186cd925e2e8d5511
 
 '''
 command: EDT threadtitle messagenumber message
 '''
 def edit_msg(msg):
-<<<<<<< HEAD
-    pass
-
-
-def upload_file(msg):
-    pass
-=======
     title, sep1, num, sep2, message = msg.data.partition(" ")
-    if not os.path.exists(THREAD_DIR + title):
+    if not os.path.exists(DATA_DIR + title):
         msg.conn.send("error")
     else:
-        f = open(THREAD_DIR + title, 'a')
-        lines = open(THREAD_DIR + title, 'r').readlines()
+        f = open(DATA_DIR + title, 'a')
+        lines = open(DATA_DIR + title, 'r').readlines()
         target_line = lines[num]
         if target_line[target_line.find(" ")+1,target_line.find(":")] == msg.user:
             lines[num] = msg.data
             f.close()
-            new_file = open(THREAD_DIR + title, "w+")
+            new_file = open(DATA_DIR + title, "w+")
             for line in lines:
                 new_file.write(line)
             new_file.close()
-        else:msg.conn.send("no right to edit this message")
+        else:
+            msg.conn.send("no right to edit this message")
 
 
 def upload_file(msg):
     threadTitle, spec, filename = msg.data.partition(" ")
-    title = THREAD_DIR + threadTitle
+    title = DATA_DIR + threadTitle
     if path.exists(title):
         msg.conn.send("the thread " + title + " is already exists")
     else:
@@ -127,24 +116,20 @@ def upload_file(msg):
             print(msg.user+" uploaded a file")
 
 
->>>>>>> 3b8bc21166188bd643a792d186cd925e2e8d5511
 
 def download_file(msg):
     threadTitle, spec, filename = msg.data.partition(" ")
-    title = THREAD_DIR+threadTitle
+    title = DATA_DIR+threadTitle
     if path.exists(title):
         with open(title,"r") as file:
             msg.conn.send(file.read())
 
-<<<<<<< HEAD
-def download_file(msg):
-    pass
-=======
->>>>>>> 3b8bc21166188bd643a792d186cd925e2e8d5511
-
+'''
+message:    Thread 9331 removed
+'''
 def remove_thread(msg):
-    title = THREAD_DIR+ msg.data
-    if not os.path.exists(THREAD_DIR + title):
+    title = DATA_DIR+ msg.data
+    if not os.path.exists(DATA_DIR + title):
         msg.conn.send("error")
     else:
         with open(title,"r") as file:
@@ -154,14 +139,6 @@ def remove_thread(msg):
         else:
             msg.conn.send("no right to remove")
 
-<<<<<<< HEAD
-'''
-message:    Thread 9331 removed
-'''
-def remove_thread(msg):
-    pass
-=======
->>>>>>> 3b8bc21166188bd643a792d186cd925e2e8d5511
 
 
 def exit_forumn(user):

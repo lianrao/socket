@@ -84,14 +84,13 @@ class CmdRspCode(Enum):
 
 
 class Msg():
-    def __init__(self, user, msg, session, conn):
+    def __init__(self, user, req, session, conn):
         self.user = user
-        self.msg = msg  # the whole sent string
         self.conn = conn
-        op, sep, mg = msg.partition(" ")
-        self.op = op
+        self.op = req.op
         self.session = session
-        self.data = mg  # the string that remove the operation string
+        self.data = req.data  # the string that remove the operation string
+        self.req = req
 
     def send(self, message):
         self.conn.send(message.encode("utf-8"))
