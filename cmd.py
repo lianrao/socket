@@ -103,16 +103,17 @@ def read_thread(msg):
 command: EDT threadtitle messagenumber message
 '''
 def edit_msg(msg):
-    title, sep1, num, sep2, message = msg.data.partition(" ")
+    title, sep1, content = msg.data.partition(" ")
+    num,sep2,message = content.partition(" ")
     res = None
     if not os.path.exists(DATA_DIR + title):
         res = RespData(RESP_CODE.COMMAND_ERROR, "the thread " + title + " not exsits")
     else:
         f = open(DATA_DIR + title, 'a')
         lines = open(DATA_DIR + title, 'r').readlines()
-        target_line = lines[num]
-        if target_line[target_line.find(" ")+1,target_line.find(":")] == msg.user:
-            lines[num] = msg.data
+        target_line = lines[int(num)]
+        if target_line[target_line.find(" ")+1:target_line.find(":")] == msg.user:
+            lines[int(num)] = num + " " + msg.user + ":" +message
             f.close()
             new_file = open(DATA_DIR + title, "w+")
             for line in lines:
@@ -141,10 +142,13 @@ def upload_file(msg):
 
 def download_file(msg):
     threadTitle, spec, filename = msg.data.partition(" ")
-    title = DATA_DIR+threadTitle
+    title = DATA_DIR + threadTitle
     if path.exists(title):
-        with open(title,"r") as file:
-            msg.conn.send(file.read())
+        res = RespData(RESP_CODE.DOWNLOAD_FILE, "DLT", filename)
+        msg.conn.send(res.serialize())
+        with open(title, "rb") as file:
+            data = file.read()
+            msg.conn.send(data)
 
 '''
 message:    Thread 9331 removed
@@ -156,7 +160,8 @@ def remove_thread(msg):
         res = RespData(RESP_CODE.COMMAND_ERROR, "the thread " + title + " not exsits")
     else:
         with open(DATA_DIR + title,"r") as file:
-            user = file.readline
+            user = file.readline()
+            user = user.replace("\n","").replace("\r","")
         if user == msg.user:
             os.remove(DATA_DIR + title)
             res = RespData(RESP_CODE.COMMAND_SUCCESS,"The thread has been removed")
