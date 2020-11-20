@@ -28,13 +28,13 @@ def checkThreadTitle(cmd):
     title = msg[0:msg.find(" ")]
     test_str = re.search(r"\w", title)
     if test_str != title:
-        print("Wrong threadTitle")
+        print("Wrong threadTitle",flush=True)
         enterCommand()
 
 def checkMessageNull(msg):
     message = msg[msg.find(" ") + 1:]
     if message == "":
-        print("message cannot be null")
+        print("message cannot be null",flush=True)
         enterCommand()
 
 
@@ -42,14 +42,14 @@ def send_cmd(cmd, s):
     flag = cmd[0: 3]
     if flag == "CRT":
         if not is_cmd_right(cmd,2):
-            print("Wrong command")
+            print("Wrong command",flush=True)
             return False
         else:
             req = ReqData(REQ_CODE.COMMAND, "CRT", cmd[4:])
             s.send(req.serialize())
     elif flag == "MSG":
         if not is_cmd_right(cmd,3):
-            print("Wrong command")
+            print("Wrong command",flush=True)
             return False
         msg = cmd[4:]
         req = ReqData(REQ_CODE.COMMAND, "MSG",msg)
@@ -58,7 +58,7 @@ def send_cmd(cmd, s):
     #DLT threadtitle messagenumber
     elif flag == "DLT":
         if not is_cmd_right(cmd,3):
-            print("Wrong command")
+            print("Wrong command",flush=True)
             return False
         msg = cmd[4:]
         req = ReqData(REQ_CODE.COMMAND, "DLT", msg)
@@ -67,7 +67,7 @@ def send_cmd(cmd, s):
     #EDT threadtitle messagenumber message
     elif flag == "EDT":
         if not is_cmd_right(cmd,3):
-            print("Wrong command")
+            print("Wrong command",flush=True)
             return False
         msg = cmd[4:]
         req = ReqData(REQ_CODE.COMMAND, "EDT", msg)
@@ -75,7 +75,7 @@ def send_cmd(cmd, s):
     #LST: List Threads
     elif flag == "LST":
         if len(cmd) > 3:
-            print("wrong command")
+            print("wrong command",flush=True)
             return False
         else:
             req = ReqData(REQ_CODE.COMMAND, "LST","")

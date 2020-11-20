@@ -18,7 +18,7 @@ def create_thread(msg):
     else:
         with open(DATA_DIR + title, "w") as file:
             file.writelines([msg.user])
-        print("Thread "+ title + " created")
+        print("Thread "+ title + " created",flush=True)
         res = RespData(RESP_CODE.COMMAND_SUCCESS,"Thread "+ title + " created")
     return res
 
@@ -30,6 +30,7 @@ The list of active threads:
 '''
 def list_threads(msg):
     arr = os.listdir(DATA_DIR)
+    arr.remove("credentials.txt")
     res = None
     if len(arr) == 0:
         res = RespData(RESP_CODE.COMMAND_SUCCESS,"No threads to list")
@@ -79,7 +80,7 @@ def del_msg(msg):
             res = RespData(RESP_CODE.COMMAND_SUCCESS,"Message has been deleted")
         else:
             res = RespData(RESP_CODE.COMMAND_ERROR,"The message belongs to another user and cannot be deleted")
-            print("Message cannot be deleted")
+            print("Message cannot be deleted",flush=True)
 
     return  res
 
@@ -93,7 +94,7 @@ def read_thread(msg):
     else:
         with open(title, "r") as file:
             res = RespData(RESP_CODE.COMMAND_SUCCESS,"\n".join(file.readlines()))
-            print("Thread " + title +" read")
+            print("Thread " + title +" read",flush=True)
 
     return res
 
@@ -118,10 +119,10 @@ def edit_msg(msg):
                 new_file.write(line)
             new_file.close()
             res = RespData(RESP_CODE.COMMAND_SUCCESS,"The message has been edited")
-            print("Message has been edited")
+            print("Message has been edited",flush=True)
         else:
             res = RespData(RESP_CODE.COMMAND_ERROR,"The message belongs to another user and cannot be edited")
-            print("Message cannot be edited")
+            print("Message cannot be edited",flush=True)
 
     return res
 
@@ -134,7 +135,7 @@ def upload_file(msg):
     else:
         with open(title, "w") as file:
             file.write(filename)
-            print(msg.user+" uploaded a file")
+            print(msg.user+" uploaded a file",flush=True)
 
 
 
@@ -159,10 +160,10 @@ def remove_thread(msg):
         if user == msg.user:
             os.remove(DATA_DIR + title)
             res = RespData(RESP_CODE.COMMAND_SUCCESS,"The thread has been removed")
-            print("Thread "+ title +" removed")
+            print("Thread "+ title +" removed",flush=True)
         else:
             res = RespData(RESP_CODE.COMMAND_ERROR,"The thread was created by another user and cannot be removed")
-            print("Thread " + title +" cannot be removed")
+            print("Thread " + title +" cannot be removed",flush=True)
 
     return res
 
@@ -173,7 +174,7 @@ command:  XIT
 '''
 def exit_forumn(msg):
     res = RespData(RESP_CODE.USER_EXIT,"Goodbye")
-    print(msg.user + " exited")
+    print(msg.user + " exited",flush=True)
     return res
 
 '''
@@ -184,12 +185,12 @@ def shutdown_server(msg):
     res = None
     if admin_pwd != "destroy":
         res = RespData(RESP_CODE.COMMAND_ERROR,"Incorrect password")
-        print("Incorrect password")
+        print("Incorrect password",flush=True)
         msg.send(res.serialize())
     else:
         shutil.rmtree(DATA_DIR, ignore_errors=True)
         res = RespData(RESP_CODE.SERVER_SHUTDOWN , "Goodbye. Server shutting down")
-        print("Server shutting down")
+        print("Server shutting down",flush=True)
         msg.session.add(KILL_SREVER)
     return res
 
@@ -201,7 +202,7 @@ def run_cmd(msg):
         res = RespData(RESP_CODE.COMMAND_ERROR," Invalid command")
         return res
     #run the correct command
-    print(msg.user + " issued " + msg.op + " command")
+    print(msg.user + " issued " + msg.op + " command",flush=True)
     if op == "CRT":
        return create_thread(msg)
     if op == "LST":

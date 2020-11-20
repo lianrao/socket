@@ -48,7 +48,7 @@ def login(socket):
 
 
 def main():
-    print(">python Client %s %d"% (serverAddr, serverPort))
+    print(">python Client %s %d"% (serverAddr, serverPort),flush=True)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
         s.connect((serverAddr, serverPort))
@@ -63,10 +63,10 @@ def main():
             if resp.code == RESP_CODE.NOT_LOGGED_IN or resp.code == RESP_CODE.USER_ALREADY_LOGGED:
                 login(s)
             if resp.code == RESP_CODE.USER_EXIT :
-                print("Gooodbye")
+                print("Gooodbye",flush=True)
                 break
             if resp.code == RESP_CODE.SERVER_SHUTDOWN:
-                print("Goodbye. Server shutting down")
+                print("Goodbye. Server shutting down",flush=True)
                 break
 
             if resp.data[0] == 1:

@@ -34,7 +34,7 @@ def server(host="", port=12346):
     s.listen(1)
     session = set()
 
-    print("Server started , Waiting for clients")
+    print("Server started , Waiting for clients",flush=True)
     ths = []
     while True:
         conn, addr = s.accept()
@@ -43,11 +43,7 @@ def server(host="", port=12346):
         ths.append(th)
         if KILL_SREVER in session:
             break
-    for t in ths:
-        t.shutdown()
-    for t in ths:
-        t.join(3)
-    print("server has shutting down")
+    print("server has shutting down",flush=True)
 
 
 
@@ -81,9 +77,9 @@ class WorkThread(threading.Thread):  #
         self.server_down = False
 
     def run(self):  # 把要执行的代码写到run函数里面 线程在创建后会直接运行run函数
-        print("Starting " + self.name)
+        print("Starting " + self.name,flush=True)
         self.work()
-        print("Exiting " + self.name)
+        print("Exiting " + self.name,flush=True)
 
     def shutdown(self):
         self.server_down = True
@@ -98,7 +94,7 @@ class WorkThread(threading.Thread):  #
         conn =self.conn
         session = self.session
         try:
-            print("Got connection from", conn.getpeername())
+            print("Got connection from", conn.getpeername(),flush=True)
             while not self.is_shutdown():
                 buf = conn.recv(1024)
                 req = ReqData.unserialize(buf)
@@ -108,7 +104,7 @@ class WorkThread(threading.Thread):  #
                 if req.code == REQ_CODE.USERNAME_INPUT:
                     res = verify_user(req,session)
                     #if the username is correct , then store it
-                    if res.code == RESP_CODE.USERNAME_IS_CORRECT:
+                    if res.code == RESP_CODE.USERNAME_IS_CORRECT or res.code == RESP_CODE.NEW_USER:
                         username = req.data
                 #input password
                 elif req.code == REQ_CODE.PASSWORD_INPUT:
@@ -137,12 +133,12 @@ class WorkThread(threading.Thread):  #
                 if res.code == RESP_CODE.USER_EXIT or res.code == RESP_CODE.SERVER_SHUTDOWN :
                     self.shutdown()
                     break
-        except:
-            print("Unexpected error:", sys.exc_info()[0])
+        except :
+            print("Unexpected error:", sys.exc_info()[0],flush=True)
             traceback.print_exc()
         finally:
             if self.server_down :
-                print("Server shutting down")
+                print("Server shutting down",flush=True)
                 res = RespData(RESP_CODE.SERVER_SHUTDOWN,"Goodbye. Server shutting down")
                 self.conn.send(res.serialize())
             conn.close()
