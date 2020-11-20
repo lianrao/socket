@@ -11,11 +11,11 @@ import sys
 from common import *
 
 from clientHandler import enterCommand
-serverAddr = "127.0.0.1"
-serverPort = 12346
+# serverAddr = "127.0.0.1"
+# serverPort = 12346
 
-# serverAddr = str(sys.argv[2])
-# serverPort = int(sys.argv[3])
+serverAddr = str(sys.argv[2])
+serverPort = int(sys.argv[3])
 #import clientService as cs
 
 
