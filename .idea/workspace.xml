@@ -37,7 +37,7 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="JupyterTrust" id="4d382a17-c296-4438-bccc-b737f98462e3" />
+  <component name="JupyterTrust" id="da035e0f-a563-4916-8a91-eb0cf90ac1ef" />
   <component name="ProjectId" id="1kSxDIhHZfk4LO5Pr6Oh24tTmgN" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -176,24 +176,28 @@
       <screen x="0" y="25" width="1440" height="811" />
     </state>
     <state width="630" height="466" key="DebuggerActiveHint/0.25.1440.811@0.25.1440.811" timestamp="1605714446462" />
-    <state width="1398" height="283" key="GridCell.Tab.0.bottom" timestamp="1605870006957">
-      <screen x="0" y="25" width="1440" height="809" />
+    <state width="1493" height="210" key="GridCell.Tab.0.bottom" timestamp="1605870419589">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state width="1493" height="210" key="GridCell.Tab.0.bottom/0.0.1536.824@0.0.1536.824" timestamp="1605870419589" />
     <state width="1398" height="283" key="GridCell.Tab.0.bottom/0.25.1440.809@0.25.1440.809" timestamp="1605870006957" />
     <state width="1398" height="257" key="GridCell.Tab.0.bottom/0.25.1440.811@0.25.1440.811" timestamp="1605815739023" />
-    <state width="1398" height="283" key="GridCell.Tab.0.center" timestamp="1605870006956">
-      <screen x="0" y="25" width="1440" height="809" />
+    <state width="1493" height="210" key="GridCell.Tab.0.center" timestamp="1605870419589">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state width="1493" height="210" key="GridCell.Tab.0.center/0.0.1536.824@0.0.1536.824" timestamp="1605870419589" />
     <state width="1398" height="283" key="GridCell.Tab.0.center/0.25.1440.809@0.25.1440.809" timestamp="1605870006956" />
     <state width="1398" height="257" key="GridCell.Tab.0.center/0.25.1440.811@0.25.1440.811" timestamp="1605815739022" />
-    <state width="1398" height="283" key="GridCell.Tab.0.left" timestamp="1605870006956">
-      <screen x="0" y="25" width="1440" height="809" />
+    <state width="1493" height="210" key="GridCell.Tab.0.left" timestamp="1605870419589">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state width="1493" height="210" key="GridCell.Tab.0.left/0.0.1536.824@0.0.1536.824" timestamp="1605870419589" />
     <state width="1398" height="283" key="GridCell.Tab.0.left/0.25.1440.809@0.25.1440.809" timestamp="1605870006956" />
     <state width="1398" height="257" key="GridCell.Tab.0.left/0.25.1440.811@0.25.1440.811" timestamp="1605815739021" />
-    <state width="1398" height="283" key="GridCell.Tab.0.right" timestamp="1605870006957">
-      <screen x="0" y="25" width="1440" height="809" />
+    <state width="1493" height="210" key="GridCell.Tab.0.right" timestamp="1605870419589">
+      <screen x="0" y="0" width="1536" height="824" />
     </state>
+    <state width="1493" height="210" key="GridCell.Tab.0.right/0.0.1536.824@0.0.1536.824" timestamp="1605870419589" />
     <state width="1398" height="283" key="GridCell.Tab.0.right/0.25.1440.809@0.25.1440.809" timestamp="1605870006957" />
     <state width="1398" height="257" key="GridCell.Tab.0.right/0.25.1440.811@0.25.1440.811" timestamp="1605815739022" />
     <state width="1398" height="283" key="GridCell.Tab.1.bottom" timestamp="1605870006959">
@@ -220,6 +224,10 @@
       <screen x="0" y="25" width="1440" height="811" />
     </state>
     <state x="229" y="66" key="SettingsEditor/0.25.1440.811@0.25.1440.811" timestamp="1605815688140" />
+    <state x="573" y="325" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605870307524">
+      <screen x="0" y="0" width="1536" height="824" />
+    </state>
+    <state x="573" y="325" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1536.824@0.0.1536.824" timestamp="1605870307524" />
     <state x="262" y="162" key="com.intellij.xdebugger.impl.breakpoints.ui.BreakpointsDialogFactory$2" timestamp="1605855177733">
       <screen x="0" y="25" width="1440" height="809" />
     </state>
@@ -251,8 +259,8 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/socket$server.coverage" NAME="server Coverage Results" MODIFIED="1605869341698" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/socket$client.coverage" NAME="client Coverage Results" MODIFIED="1605870038925" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/socket$test.coverage" NAME="test Coverage Results" MODIFIED="1605804044937" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/socket$client.coverage" NAME="client Coverage Results" MODIFIED="1605869346802" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/socket$server.coverage" NAME="server Coverage Results" MODIFIED="1605870029861" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

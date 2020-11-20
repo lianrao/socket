@@ -12,31 +12,6 @@ def is_cmd_right(cmd,num):
     return True
 
 
-#enter username
-def enterUsername():
-    username = input("Enter username: ")
-    req = ReqData(REQ_CODE.USERNAME_INPUT, REQ_CODE.USERNAME_INPUT, username)
-    return(req.serialize())
-
-def enterPassword():
-    password = input("Enter password: ")
-    req = ReqData(REQ_CODE.PASSWORD_INPUT, REQ_CODE.PASSWORD_INPUT, password)
-    return (req.serialize())
-
-def checkThreadTitle(cmd):
-    msg = cmd[4:]
-    title = msg[0:msg.find(" ")]
-    test_str = re.search(r"\w", title)
-    if test_str != title:
-        print("Wrong threadTitle",flush=True)
-        enterCommand()
-
-def checkMessageNull(msg):
-    message = msg[msg.find(" ") + 1:]
-    if message == "":
-        print("message cannot be null",flush=True)
-        enterCommand()
-
 
 def send_cmd(cmd, s):
     flag = cmd[0: 3]
@@ -119,6 +94,9 @@ def send_cmd(cmd, s):
     #XIT: Exit
     #XIT
     elif flag == "XIT":
+        if len(cmd) > 3:
+            print("wrong command",flush=True)
+            return False
         req = ReqData(REQ_CODE.COMMAND, "XIT","")
         s.send(req.serialize())
     #SHT: Shutdown
