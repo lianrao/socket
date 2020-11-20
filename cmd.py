@@ -11,12 +11,12 @@ CMD_SET = {"CRT", "LST", "MSG", "DLT", "RDT", "EDT", "UPD", "DWN", "RMV", "XIT",
 command:    CRT 3331
 '''
 def create_thread(msg):
-    title = DATA_DIR + msg.data
+    title = msg.data
     res = None
-    if os.path.isfile(title):
+    if os.path.isfile(DATA_DIR + title):
         res = RespData(RESP_CODE.COMMAND_ERROR,"Thread " + title + " exists")
     else:
-        with open(title, "w") as file:
+        with open(DATA_DIR + title, "w") as file:
             file.writelines([msg.user])
         print("Thread "+ title + " created")
         res = RespData(RESP_CODE.COMMAND_SUCCESS,"Thread "+ title + " created")
@@ -149,15 +149,15 @@ def download_file(msg):
 message:    Thread 9331 removed
 '''
 def remove_thread(msg):
-    title = DATA_DIR+ msg.data
+    title = msg.data
     res = None
     if not os.path.exists(DATA_DIR + title):
         res = RespData(RESP_CODE.COMMAND_ERROR, "the thread " + title + " not exsits")
     else:
-        with open(title,"r") as file:
+        with open(DATA_DIR + title,"r") as file:
             user = file.readline
         if user == msg.user:
-            os.remove(title)
+            os.remove(DATA_DIR + title)
             res = RespData(RESP_CODE.COMMAND_SUCCESS,"The thread has been removed")
             print("Thread "+ title +" removed")
         else:
@@ -172,7 +172,7 @@ def remove_thread(msg):
 command:  XIT
 '''
 def exit_forumn(msg):
-    res = RespData(RESP_CODE.COMMAND_SUCCESS,"Goodbye")
+    res = RespData(RESP_CODE.USER_EXIT,"Goodbye")
     print(msg.user + " exited")
     return res
 

@@ -2,6 +2,7 @@
 import sys
 from enum import Enum
 from enum import auto
+import os
 
 '''
 commont function used by first and second server
@@ -33,6 +34,7 @@ class RESP_CODE(Enum):
     COMMAND_ERROR = auto()
 
     USER_EXIT = auto()
+    NEW_USER = auto()
 
     SERVER_SHUTDOWN = auto()
 
@@ -112,7 +114,7 @@ def verify_user(req, session):
 
     #check user whether already logged in
     username = req.data
-    res = RespData(RESP_CODE.USERNAME_IS_WRONG,username + " not exists.")
+    res = RespData(RESP_CODE.NEW_USER,username + "is new user")
     if username in session:
         conten = username + " has already logged in"
         res = RespData(RESP_CODE.USER_ALREADY_LOGGED, conten)
@@ -120,6 +122,12 @@ def verify_user(req, session):
         return res
 
     #check username whetheh is correct
+    if not os.path.isfile(DATA_DIR + "credentials.txt"):
+        open(DATA_DIR + "credentials.txt" , 'a').close()
+        res = RespData(RESP_CODE.NEW_USER,"new user")
+        session.add(username)
+        return res
+
     with open(DATA_DIR + "credentials.txt") as file:
         lines = file.readlines()
         for cred in lines:
@@ -138,7 +146,7 @@ def verify_pwd(username, pwd):
         for cred in lines:
             arr = cred.rstrip("\n").split(" ")
             if username == arr[0] and pwd == arr[1]:
-                res = RespData(RESP_CODE.PWD_IS_CORRECT, username + " is logged in")
+                res = RespData(RESP_CODE.LOGGED_IN, username + " is logged in")
                 break
     if not res:
         res = RespData(RESP_CODE.PWD_IS_WRONG,"Invalid password")
@@ -151,8 +159,12 @@ def check_user_with_pass(usernanme, password):
     pass
 
 
-def add_user(username, password):
-    pass
+def add_user(data):
+    username , sep , pwd = data.partition(" ")
+    with open(DATA_DIR + "credentials.txt","a") as f:
+        f.write(username + " " + pwd + "\n")
+    res = RespData(RESP_CODE.LOGGED_IN,"user logged in")
+    return res
 
 
 def save_file(file):

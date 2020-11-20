@@ -15,15 +15,15 @@ from concurrent.futures import ThreadPoolExecutor
 '''
 init the data diretory
 '''
-serverPort = int(sys.argv[2])
-serverAdmin = sys.argv[3]
+# serverPort = int(sys.argv[2])
+# serverAdmin = sys.argv[3]
 
 def init():
     if not os.path.isdir(DATA_DIR):
         os.mkdir(DATA_DIR)
 
 
-def server(host="", port=12345):
+def server(host="", port=12346):
     init()
     address = (host, port)
     time_now = time.strftime("%Y-%m-%d %H:%S:%M", time.localtime())
@@ -35,12 +35,20 @@ def server(host="", port=12345):
     session = set()
 
     print("Server started , Waiting for clients")
-    th = AcceptThread(s,session)
-    th.start()
+    ths = []
     while True:
+        conn, addr = s.accept()
+        th = WorkThread(conn, session)
+        th.start()
+        ths.append(th)
         if KILL_SREVER in session:
             break
-        time.sleep(1)
+    # th = AcceptThread(s,sessionn)
+    # th.start()
+    # while True:
+    #     if KILL_SREVER in session:
+    #         break
+    #     time.sleep(1)
     print("server has shutting down")
 
 
@@ -110,13 +118,13 @@ class WorkThread(threading.Thread):  #
                     else :
                        pwd = req.data
                        res = verify_pwd(username,pwd)
-                       if res.code == RESP_CODE.PWD_IS_CORRECT:
+                       if res.code == RESP_CODE.LOGGED_IN:
                             #if logged in , then add the user to session
                             session.add(username)
                             loggedin = True
                 #create a new user with input password
                 elif req.code == REQ_CODE.USER_CREATE :
-                    res = add_user(username,req.data)
+                    res = add_user(req.data)
                 else:
                     #command process
                     if not loggedin :
