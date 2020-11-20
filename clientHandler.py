@@ -102,7 +102,9 @@ def send_cmd(cmd, s):
     #DWN: Download file
     #DWN threadtitle filename
     elif flag == "DWN":
-        checkThreadTitle(cmd)
+        if not is_cmd_right(cmd,2):
+            print("Wrong command")
+            return False
         threadTitle, spec, filename = cmd[4:].partition(" ")
         req = ReqData(REQ_CODE.COMMAND, "DWN", threadTitle + filename)
         s.send(req.serialize())
