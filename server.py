@@ -15,8 +15,8 @@ from concurrent.futures import ThreadPoolExecutor
 '''
 init the data diretory
 '''
-serverPort = int(sys.argv[2])
-serverAdmin = sys.argv[3]
+# serverPort = int(sys.argv[2])
+# serverAdmin = sys.argv[3]
 
 def init():
     if not os.path.isdir(DATA_DIR):
@@ -43,13 +43,12 @@ def server(host="", port=12346):
         ths.append(th)
         if KILL_SREVER in session:
             break
-    # th = AcceptThread(s,sessionn)
-    # th.start()
-    # while True:
-    #     if KILL_SREVER in session:
-    #         break
-    #     time.sleep(1)
+    for t in ths:
+        t.shutdown()
+    for t in ths:
+        t.join(3)
     print("server has shutting down")
+
 
 
 
@@ -125,6 +124,8 @@ class WorkThread(threading.Thread):  #
                 #create a new user with input password
                 elif req.code == REQ_CODE.USER_CREATE :
                     res = add_user(req.data)
+                    username, sep, pwd = req.data.partition(" ")
+                    loggedin = True
                 else:
                     #command process
                     if not loggedin :
@@ -134,6 +135,7 @@ class WorkThread(threading.Thread):  #
                         res = run_cmd(c_msg)
                 conn.send(res.serialize())
                 if res.code == RESP_CODE.USER_EXIT or res.code == RESP_CODE.SERVER_SHUTDOWN :
+                    self.shutdown()
                     break
         except:
             print("Unexpected error:", sys.exc_info()[0])

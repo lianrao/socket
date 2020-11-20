@@ -68,9 +68,9 @@ def del_msg(msg):
     else:
         f = open(DATA_DIR+title, 'a')
         lines = open(DATA_DIR+title, 'r').readlines()
-        target_line = lines[num]
-        if target_line[target_line.find(" ")+1,target_line.find(":")] == msg.user:
-            del(lines[num])
+        target_line = lines[int(num)]
+        if target_line[target_line.find(" ")+1:target_line.find(":")] == msg.user:
+            del(lines[int(num)])
             f.close()
             new_file = open(DATA_DIR+title, "w+")
             for line in lines:

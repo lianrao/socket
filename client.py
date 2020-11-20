@@ -11,11 +11,11 @@ import sys
 from common import *
 
 from clientHandler import enterCommand
-# serverAddr = "127.0.0.1"
-# serverPort = 12346
+serverAddr = "127.0.0.1"
+serverPort = 12346
 
-serverAddr = str(sys.argv[2])
-serverPort = int(sys.argv[3])
+# serverAddr = str(sys.argv[2])
+# serverPort = int(sys.argv[3])
 #import clientService as cs
 
 
@@ -33,6 +33,9 @@ def login(socket):
         if res.code == RESP_CODE.NEW_USER:
             pwd = input("pls Enter the new password")
             req = ReqData(REQ_CODE.USER_CREATE, REQ_CODE.USER_CREATE.name, username + " " + pwd)
+        elif res.code == RESP_CODE.USER_ALREADY_LOGGED:
+            print(res.data)
+            continue
         else:
             password = input("Enter password: ")
             req = ReqData(REQ_CODE.PASSWORD_INPUT, REQ_CODE.PASSWORD_INPUT.name, password)
@@ -57,10 +60,13 @@ def main():
             enterCommand(s)
             msg = s.recv(1024)
             resp = RespData.unserialize(msg)
-            if resp.code == RESP_CODE.NOT_LOGGED_IN:
+            if resp.code == RESP_CODE.NOT_LOGGED_IN or resp.code == RESP_CODE.USER_ALREADY_LOGGED:
                 login(s)
             if resp.code == RESP_CODE.USER_EXIT :
                 print("Gooodbye")
+                break
+            if resp.code == RESP_CODE.SERVER_SHUTDOWN:
+                print("Goodbye. Server shutting down")
                 break
 
             if resp.data[0] == 1:
